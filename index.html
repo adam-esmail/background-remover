@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Background Music Remover</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Remove Background Music from Audio</h1>
+        <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+            <label for="fileInput">Upload Audio File:</label>
+            <input type="file" id="fileInput" name="file" accept="audio/*" required>
+            <button type="submit">Upload and Process</button>
+        </form>
+        <div id="downloadLink" style="display:none;">
+            <h2>Processed Audio:</h2>
+            <a id="link" href="#" download>Download Here</a>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
