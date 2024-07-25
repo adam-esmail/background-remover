@@ -8,15 +8,26 @@
 </head>
 <body>
     <div class="container">
-        <h1>Remove Background Music from Audio</h1>
+        <h1>Remove Background Music from Video</h1>
         <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-            <label for="fileInput">Upload Audio File:</label>
-            <input type="file" id="fileInput" name="file" accept="audio/*" required>
+            <label for="fileInput">Upload Video File (MP4):</label>
+            <input type="file" id="fileInput" name="file" accept="video/mp4" required>
             <button type="submit">Upload and Process</button>
         </form>
         <div id="downloadLink" style="display:none;">
             <h2>Processed Audio:</h2>
             <a id="link" href="#" download>Download Here</a>
+        </div>
+        <div id="audioPlayer" style="display:none;">
+            <h2>Listen to Processed Audio:</h2>
+            <audio id="audio" controls>
+                <source id="audioSource" src="#" type="audio/wav">
+                Your browser does not support the audio element.
+            </audio>
+            <div id="controls">
+                <button id="playPauseBtn">Play</button>
+                <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>
