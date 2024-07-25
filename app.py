@@ -3,12 +3,17 @@ from flask import Flask, request, send_from_directory, jsonify
 from werkzeug.utils import secure_filename
 import torchaudio
 from openunmix import predict
+from moviepy.editor import VideoFileClip
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
 PROCESSED_FOLDER = 'processed'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['PROCESSED_FOLDER'] = PROCESSED_FOLDER
+
+def extract_audio_from_video(video_path, audio_path):
+    video = VideoFileClip(video_path)
+    video.audio.write_audiofile(audio_path)
 
 def load_audio(file_path):
     waveform, sample_rate = torchaudio.load(file_path)
@@ -42,15 +47,22 @@ def upload_file():
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(file_path)
 
-    waveform, sample_rate = load_audio(file_path)
+    # Extract audio if the file is an MP4 video
+    if filename.endswith('.mp4'):
+        audio_path = file_path.rsplit('.', 1)[0] + '.wav'
+        extract_audio_from_video(file_path, audio_path)
+    else:
+        audio_path = file_path
+
+    waveform, sample_rate = load_audio(audio_path)
     vocals, drums, bass, other = separate_sources(waveform, sample_rate)
     combined_waveform = combine_sources(vocals, drums, other)
     
-    processed_filename = 'processed_' + filename
+    processed_filename = 'processed_' + os.path.basename(audio_path)
     processed_file_path = os.path.join(app.config['PROCESSED_FOLDER'], processed_filename)
     save_audio(combined_waveform, sample_rate, processed_file_path)
 
-    return jsonify(success=True, filepath=processed_file_path), 200
+    return jsonify(success=True, filepath='/' + processed_file_path), 200
 
 @app.route('/processed/<filename>')
 def download_file(filename):
