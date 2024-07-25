@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 import torchaudio
 from openunmix import predict
 from moviepy.editor import VideoFileClip
+import time
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
@@ -54,6 +55,12 @@ def upload_file():
     else:
         audio_path = file_path
 
+    # Simulate progress
+    progress = 0
+    for _ in range(10):
+        time.sleep(1)  # Simulate work being done
+        progress += 10
+
     waveform, sample_rate = load_audio(audio_path)
     vocals, drums, bass, other = separate_sources(waveform, sample_rate)
     combined_waveform = combine_sources(vocals, drums, other)
@@ -62,7 +69,7 @@ def upload_file():
     processed_file_path = os.path.join(app.config['PROCESSED_FOLDER'], processed_filename)
     save_audio(combined_waveform, sample_rate, processed_file_path)
 
-    return jsonify(success=True, filepath='/' + processed_file_path), 200
+    return jsonify(success=True, filepath=f'/processed/{processed_filename}'), 200
 
 @app.route('/processed/<filename>')
 def download_file(filename):
