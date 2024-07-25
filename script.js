@@ -2,55 +2,71 @@ document.getElementById('uploadForm').addEventListener('submit', function (event
     event.preventDefault();
     const formData = new FormData(this);
 
-    fetch('/upload', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const downloadLink = document.getElementById('downloadLink');
-            const link = document.getElementById('link');
-            link.href = data.filepath;
-            downloadLink.style.display = 'block';
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    progressContainer.style.display = 'block';
 
-            const audioPlayer = document.getElementById('audioPlayer');
-            const audio = document.getElementById('audio');
-            const audioSource = document.getElementById('audioSource');
-            audioSource.src = data.filepath;
-            audio.load();
-            audioPlayer.style.display = 'block';
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/upload', true);
+
+    xhr.upload.onprogress = function (event) {
+        if (event.lengthComputable) {
+            const percentComplete = (event.loaded / event.total) * 100;
+            progressBar.value = percentComplete;
+            progressText.textContent = Math.round(percentComplete) + '%';
         }
-    })
-    .catch(error => console.error('Error:', error));
+    };
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            const data = JSON.parse(xhr.responseText);
+            if (data.success) {
+                const downloadLink = document.getElementById('downloadLink');
+                const link = document.getElementById('link');
+                const audioPlayer = document.getElementById('audioPlayer');
+                const audioSource = document.getElementById('audioSource');
+
+                link.href = data.filepath;
+                audioSource.src = data.filepath;
+                audioPlayer.load();
+                
+                progressContainer.style.display = 'none';
+                downloadLink.style.display = 'block';
+            }
+        }
+    };
+
+    xhr.send(formData);
 });
 
-const audio = document.getElementById('audio');
-const playPauseBtn = document.getElementById('playPauseBtn');
-const currentTimeDisplay = document.getElementById('currentTime');
-const durationDisplay = document.getElementById('duration');
+const audioPlayer = document.getElementById('audioPlayer');
+const playPauseButton = document.getElementById('playPauseButton');
+const currentTimeElement = document.getElementById('currentTime');
+const durationElement = document.getElementById('duration');
 
-audio.addEventListener('loadedmetadata', () => {
-    durationDisplay.textContent = formatTime(audio.duration);
-});
-
-audio.addEventListener('timeupdate', () => {
-    currentTimeDisplay.textContent = formatTime(audio.currentTime);
-});
-
-playPauseBtn.addEventListener('click', () => {
-    if (audio.paused) {
-        audio.play();
-        playPauseBtn.textContent = 'Pause';
+playPauseButton.addEventListener('click', function () {
+    if (audioPlayer.paused) {
+        audioPlayer.play();
+        playPauseButton.textContent = 'Pause';
     } else {
-        audio.pause();
-        playPauseBtn.textContent = 'Play';
+        audioPlayer.pause();
+        playPauseButton.textContent = 'Play';
     }
+});
+
+audioPlayer.addEventListener('timeupdate', function () {
+    const currentTime = formatTime(audioPlayer.currentTime);
+    currentTimeElement.textContent = currentTime;
+});
+
+audioPlayer.addEventListener('loadedmetadata', function () {
+    const duration = formatTime(audioPlayer.duration);
+    durationElement.textContent = duration;
 });
 
 function formatTime(seconds) {
     const minutes = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+    const secondsPart = Math.floor(seconds % 60);
+    return `${minutes.toString().padStart(2, '0')}:${secondsPart.toString().padStart(2, '0')}`;
 }
-
