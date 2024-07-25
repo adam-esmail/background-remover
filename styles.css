@@ -44,3 +44,19 @@ button {
 button:hover {
     background-color: #0056b3;
 }
+
+#controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+
+#controls button {
+    margin-right: 10px;
+    padding: 5px 10px;
+}
+
+#controls span {
+    font-size: 1rem;
+}
