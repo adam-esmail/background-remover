@@ -14,19 +14,22 @@
             <input type="file" id="fileInput" name="file" accept="video/mp4" required>
             <button type="submit">Upload and Process</button>
         </form>
+        <div id="progressContainer" style="display:none;">
+            <h2>Processing...</h2>
+            <progress id="progressBar" value="0" max="100"></progress>
+            <p id="progressText">0%</p>
+        </div>
         <div id="downloadLink" style="display:none;">
             <h2>Processed Audio:</h2>
             <a id="link" href="#" download>Download Here</a>
-        </div>
-        <div id="audioPlayer" style="display:none;">
-            <h2>Listen to Processed Audio:</h2>
-            <audio id="audio" controls>
-                <source id="audioSource" src="#" type="audio/wav">
+            <br>
+            <audio id="audioPlayer" controls>
+                <source id="audioSource" src="" type="audio/wav">
                 Your browser does not support the audio element.
             </audio>
-            <div id="controls">
-                <button id="playPauseBtn">Play</button>
-                <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+            <div id="playerControls">
+                <button id="playPauseButton">Play</button>
+                <span id="currentTime">00:00</span> / <span id="duration">00:00</span>
             </div>
         </div>
     </div>
